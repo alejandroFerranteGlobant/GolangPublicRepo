@@ -38,7 +38,6 @@ func handlePost(w http.ResponseWriter, r *http.Request){
 			
             //CHECK CORRECT DESTINATION
             
-             
             doUpload(w,r)
     }
 
