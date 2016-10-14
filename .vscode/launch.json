@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Assets",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceRoot}/assets-core/src/assets-core/assets-core",
+            "env": { "GOPATH": "${workspaceRoot}/assets-core/src/assets-core" },
+            "args": [],
+            "showLog": true
+        }
+    ]
+}

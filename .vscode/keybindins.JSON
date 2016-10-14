@@ -1,0 +1,7 @@
+[
+    {
+        "key": "ctrl+shift+z",
+        "command": "workbench.action.tasks.terminate",
+        "when": "editorTextFocus"
+    } 
+]
