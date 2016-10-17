@@ -9,7 +9,7 @@ import (
 
 func handleUpload(w http.ResponseWriter, r *http.Request){
 
-	doUpload(w,r,"C:/TST/")
+	doUpload(w,r,"C:/TST/")//TODO: Make this dynamic; pass path as parameter int the request or URL
 	w.WriteHeader(http.StatusOK)
 
 }
@@ -26,7 +26,7 @@ func doUpload(w http.ResponseWriter, r *http.Request, destinationPath string){
 
     //GET MULIPART FILE MAP
     formdata := r.MultipartForm
-    if(LOG_ACTIVITY){fmt.Println("MAP: ",formdata.File,":",len(formdata.File))}
+    if(logActivity){fmt.Println("MAP: ",formdata.File,":",len(formdata.File))}
     
     //ITERATE ALL FILES
     i := 1
@@ -34,7 +34,7 @@ func doUpload(w http.ResponseWriter, r *http.Request, destinationPath string){
         for _, fileHandler := range fileHandlers {
             
             //CREATE DESTINATION FILE ON DISK
-            dst, creationError := os.Create( fmt.Sprintf("%s/RecievedFile%d.txt", destinationPath,i) )//TODO: Make this dynamic; pass path as parameter int the request or URL
+            dst, creationError := os.Create( fmt.Sprintf("%s/RecievedFile%d.txt", destinationPath,i) )
             if(creationError != nil){
                 fileCreationError(w,r)
                 return

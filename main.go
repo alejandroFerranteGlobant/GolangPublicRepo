@@ -5,7 +5,7 @@ import (
 	"mux" 
 )
 
-var LOG_ACTIVITY = true
+var logActivity = true
 
 func main() {
 	
