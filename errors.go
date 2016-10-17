@@ -1,19 +1,20 @@
 package main
 
 import(
+    //"net/http"
+    //"fmt"
     "net/http"
-    "fmt"
 )
 
-func emptyURLError(w http.ResponseWriter){
-    fmt.Fprintln(w, "ERROR: The URL is empty")
-}
 
-
-func failedFileCreationError(){
+func multipartParsingError(w http.ResponseWriter, r *http.Request){
 
 }
-    
-func    failedCoyingFileError(){
+
+func fileOpenError(w http.ResponseWriter, r *http.Request){
+
+}
+
+func fileCreationError(w http.ResponseWriter, r *http.Request){
 
 }

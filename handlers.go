@@ -3,80 +3,58 @@ package main
 import (
     "net/http"
     "fmt"
-    "strings"
     "io"
     "os"
 )
 
-//-******************
-//MAIN FUNCTIONS
-//-******************
+func handleUpload(w http.ResponseWriter, r *http.Request){
 
-func handleGet(w http.ResponseWriter, r *http.Request){
-    if(LOG_ACTIVITY){
-        fmt.Println("Handling GET")
-    }
-    handlePost(w, r)
+	doUpload(w,r,"C:/TST/")
+	w.WriteHeader(http.StatusOK)
+
 }
 
-func handlePost(w http.ResponseWriter, r *http.Request){
-    if(LOG_ACTIVITY){
-        fmt.Println("Handling POST")
-    }
 
-    parameters := strings.Split(strings.Replace(r.URL.String(), " ", "", -1),"/")
-    
-    //CHECK EMPTY URL
-    if(len(parameters) == 0){
-        emptyURLError(w)
+func doUpload(w http.ResponseWriter, r *http.Request, destinationPath string){
+
+    //PARSE MULTIPART
+    parsingError := r.ParseMultipartForm(2000000)
+    if(parsingError != nil){
+        multipartParsingError(w,r)
         return
     }
 
-    switch actionRequested := parameters[1]; actionRequested {
-		case "upload":
-            if(LOG_ACTIVITY){ fmt.Println("Upload requested") }
-			
-            //CHECK CORRECT DESTINATION
+    //GET MULIPART FILE MAP
+    formdata := r.MultipartForm
+    if(LOG_ACTIVITY){fmt.Println("MAP: ",formdata.File,":",len(formdata.File))}
+    
+    //ITERATE ALL FILES
+    i := 1
+    for _, fileHandlers := range formdata.File { 
+        for _, fileHandler := range fileHandlers {
             
-            doUpload(w,r)
-    }
+            //CREATE DESTINATION FILE ON DISK
+            dst, creationError := os.Create( fmt.Sprintf("%s/RecievedFile%d.txt", destinationPath,i) )//TODO: Make this dynamic; pass path as parameter int the request or URL
+            if(creationError != nil){
+                fileCreationError(w,r)
+                return
+            }
+            i++
 
-}
-
-//-******************
-//AUXILIAR FUNCTIONS
-//-******************
-
-func doUpload(w http.ResponseWriter, r *http.Request){
-
-    //EXRACT FILE FROM HTTP REQUEST
-
-        //recievedFile, header, err := r.FormFile("file")
-        recievedFile, exractionError, _ := r.FormFile("file")
-
-        if(recievedFile == nil || exractionError != nil){
-            if(LOG_ACTIVITY){fmt.Println("NO FILE RECIEVED")}
-            return
+            //OPEN FILE             
+            file, err := fileHandler.Open()
+            if err != nil {
+ 			    fileOpenError(w,r)
+ 			    return
+ 		    }
+            
+            //COPY FILE TO DESTINATION ON DISK
+            io.Copy(dst, file);
+ 		    defer file.Close()
+ 		    
         }
 
-
-        defer recievedFile.Close()
-        if(LOG_ACTIVITY){fmt.Println("FILE RECIEVED: ",recievedFile)}
-
-
-    //CREATE EMPTY FILE
-        outputFile, fileCreationError := os.Create("//C:/newFile")  //TODO: Change to use recieved path
-        
-        if(fileCreationError != nil){
-            failedFileCreationError()
-        }
-        
-    //COPY FILE
-        _,copyError := io.Copy(outputFile, recievedFile)
-        
-        if(copyError != nil){
-            failedCoyingFileError()
-        }
-
+ 	}
+    
 }
 
