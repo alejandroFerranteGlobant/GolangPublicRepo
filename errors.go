@@ -7,14 +7,14 @@ import(
 )
 
 
-func multipartParsingError(w http.ResponseWriter, r *http.Request){
+func multipartParsingError(w http.ResponseWriter, r *http.Request, theError error){
 
 }
 
-func fileOpenError(w http.ResponseWriter, r *http.Request){
+func fileOpenError(w http.ResponseWriter, r *http.Request, theError error){
 
 }
 
-func fileCreationError(w http.ResponseWriter, r *http.Request){
+func fileCreationError(w http.ResponseWriter, r *http.Request, theError error){
 
 }

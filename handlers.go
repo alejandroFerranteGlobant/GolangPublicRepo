@@ -9,18 +9,31 @@ import (
 
 func handleUpload(w http.ResponseWriter, r *http.Request){
 
-	doUpload(w,r,"C:/TST/")//TODO: Make this dynamic; pass path as parameter int the request or URL
+	doUpload(w,r)
 	w.WriteHeader(http.StatusOK)
 
 }
 
 
-func doUpload(w http.ResponseWriter, r *http.Request, destinationPath string){
+func doUpload(w http.ResponseWriter, r *http.Request){
+
+    var destinationPath string
+    var memoryparsingLimit int64
+
+    settings, loadSettingsError := LoadSettings()
+    if(loadSettingsError != nil){
+        fmt.Println("NO SETTINGS FOUND, USING DEFAULT SETINGS")
+        destinationPath = "C:"
+        memoryparsingLimit = 200000
+    }else{
+        destinationPath = settings.DestinationPath
+        memoryparsingLimit = settings.ParsingMemoryLimit
+    }
 
     //PARSE MULTIPART
-    parsingError := r.ParseMultipartForm(2000000)
+    parsingError := r.ParseMultipartForm(memoryparsingLimit)
     if(parsingError != nil){
-        multipartParsingError(w,r)
+        multipartParsingError(w,r,parsingError)
         return
     }
 
@@ -36,15 +49,15 @@ func doUpload(w http.ResponseWriter, r *http.Request, destinationPath string){
             //CREATE DESTINATION FILE ON DISK
             dst, creationError := os.Create( fmt.Sprintf("%s/RecievedFile%d.txt", destinationPath,i) )
             if(creationError != nil){
-                fileCreationError(w,r)
+                fileCreationError(w,r,creationError)
                 return
             }
             i++
 
             //OPEN FILE             
-            file, err := fileHandler.Open()
-            if err != nil {
- 			    fileOpenError(w,r)
+            file, openError := fileHandler.Open()
+            if openError != nil {
+ 			    fileOpenError(w,r,openError)
  			    return
  		    }
             
