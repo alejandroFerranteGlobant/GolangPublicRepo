@@ -10,7 +10,6 @@ import (
 func handleUpload(w http.ResponseWriter, r *http.Request){
 
 	doUpload(w,r)
-    doUpload(w,r)
 	w.WriteHeader(http.StatusOK)
 
 }
