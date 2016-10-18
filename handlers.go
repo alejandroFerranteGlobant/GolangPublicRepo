@@ -10,6 +10,7 @@ import (
 func handleUpload(w http.ResponseWriter, r *http.Request){
 
 	doUpload(w,r)
+    doUpload(w,r)
 	w.WriteHeader(http.StatusOK)
 
 }
@@ -18,10 +19,10 @@ func handleUpload(w http.ResponseWriter, r *http.Request){
 func doUpload(w http.ResponseWriter, r *http.Request){
 
     //LOAD SETTINGS
-    GetSettings()
+    sysSettings := GetSettings()
 
     //PARSE MULTIPART
-    parsingError := r.ParseMultipartForm(SystemSettings.ParsingMemoryLimit)
+    parsingError := r.ParseMultipartForm(sysSettings.ParsingMemoryLimit)
     if(parsingError != nil){
         multipartParsingError(w,r,parsingError)
         return
@@ -29,7 +30,7 @@ func doUpload(w http.ResponseWriter, r *http.Request){
 
     //GET MULIPART FILE MAP
     formdata := r.MultipartForm
-    if(logActivity){fmt.Println("MAP: ",formdata.File,":",len(formdata.File))}
+    if(logActivity){fmt.Println("MULTIPART FILES MAP: ",formdata.File,":",len(formdata.File))}
     
     //ITERATE ALL FILES
     i := 1
@@ -37,7 +38,7 @@ func doUpload(w http.ResponseWriter, r *http.Request){
         for _, fileHandler := range fileHandlers {
             
             //CREATE DESTINATION FILE ON DISK
-            dst, creationError := os.Create( fmt.Sprintf("%s/RecievedFile%d.txt", SystemSettings.DestinationPath,i) )
+            dst, creationError := os.Create( fmt.Sprintf("%s/RecievedFile%d.txt", sysSettings.DestinationPath,i) )
             if(creationError != nil){
                 fileCreationError(w,r,creationError)
                 return

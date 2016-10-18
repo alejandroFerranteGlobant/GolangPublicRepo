@@ -11,7 +11,10 @@ import (
 var settingsLocationPath = "C:/TST/"
 
 //Global singleton variable that holds the settings
-var SystemSettings *Settings
+var systemSettings *Settings
+
+
+var once sync.Once
 
 
 type Settings struct{
@@ -29,19 +32,22 @@ func (self *Settings) Set(destination string, memoryLimit int64) {
 }
 
 //Function to load settings from JSON 
-func GetSettings() {
+func GetSettings() (*Settings){
 
-	if SystemSettings == nil {
-        
+	//if systemSettings == nil {
+    once.Do(func() {
+
         settings, loadSettingsError := LoadSettings()
         if(loadSettingsError != nil){
             fmt.Println("NO SETTINGS FOUND, USING DEFAULT SETINGS")
-            SystemSettings.DestinationPath = "C:"
-            SystemSettings.ParsingMemoryLimit = 200000
+            systemSettings.DestinationPath = "C:"
+            systemSettings.ParsingMemoryLimit = 200000
         }
-        SystemSettings = &settings
+        systemSettings = &settings
 
-	}
+	})
+
+    return systemSettings
 }
 
 
