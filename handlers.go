@@ -17,21 +17,11 @@ func handleUpload(w http.ResponseWriter, r *http.Request){
 
 func doUpload(w http.ResponseWriter, r *http.Request){
 
-    var destinationPath string
-    var memoryparsingLimit int64
-
-    settings, loadSettingsError := LoadSettings()
-    if(loadSettingsError != nil){
-        fmt.Println("NO SETTINGS FOUND, USING DEFAULT SETINGS")
-        destinationPath = "C:"
-        memoryparsingLimit = 200000
-    }else{
-        destinationPath = settings.DestinationPath
-        memoryparsingLimit = settings.ParsingMemoryLimit
-    }
+    //LOAD SETTINGS
+    GetSettings()
 
     //PARSE MULTIPART
-    parsingError := r.ParseMultipartForm(memoryparsingLimit)
+    parsingError := r.ParseMultipartForm(SystemSettings.ParsingMemoryLimit)
     if(parsingError != nil){
         multipartParsingError(w,r,parsingError)
         return
@@ -47,7 +37,7 @@ func doUpload(w http.ResponseWriter, r *http.Request){
         for _, fileHandler := range fileHandlers {
             
             //CREATE DESTINATION FILE ON DISK
-            dst, creationError := os.Create( fmt.Sprintf("%s/RecievedFile%d.txt", destinationPath,i) )
+            dst, creationError := os.Create( fmt.Sprintf("%s/RecievedFile%d.txt", SystemSettings.DestinationPath,i) )
             if(creationError != nil){
                 fileCreationError(w,r,creationError)
                 return
