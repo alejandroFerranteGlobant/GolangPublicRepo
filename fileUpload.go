@@ -40,7 +40,7 @@ func newfileUploadRequest(uri string, params map[string]string, paramName, path 
   return req, err
 }
 
-func createFileUploadRequest(targetURL string, paramName, path string) (*http.Request, error) {
+func createFileUploadRequest(targetURL string, paramName, path string,fileRepeat int) (*http.Request, error) {
   
   //GET FILE HANDLER
   file, err := os.Open(path)
@@ -55,12 +55,16 @@ func createFileUploadRequest(targetURL string, paramName, path string) (*http.Re
   //CREATE WRITER FOR WRITER
   writer := multipart.NewWriter(requestBody)
 
-  //WRITE PART
-  part, err := writer.CreateFormFile(paramName, filepath.Base(path))
-  if err != nil {
-      return nil, err
-  }
-  _, err = io.Copy(part, file)
+ i := 0
+ for(i<fileRepeat){
+    //WRITE PART
+    part, err := writer.CreateFormFile(fmt.Sprintf("%s_%d",paramName,i), filepath.Base(path))
+    if err != nil {
+        return nil, err
+    }
+    _, err = io.Copy(part, file)
+    i++
+ }
 
   //CLOSE WRITER
   err = writer.Close()
@@ -79,7 +83,7 @@ func main2() {
   //path, _ := os.Getwd()
   //path += "/test.pdf"
 
-  request, err := createFileUploadRequest("http://localhost:8080/upload",  "file", "C://Users//ale.ferrante//Documents//sample.txt")
+  request, err := createFileUploadRequest("http://localhost:8080/assets",  "file", "C://test.txt",500)
   if err != nil {
       log.Fatal(err)
   }
